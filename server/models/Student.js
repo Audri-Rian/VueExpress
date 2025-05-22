@@ -1,10 +1,19 @@
+const { validate } = require("cpf-check");
 const mongoose = require("mongoose");
 
 const studentsSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, minLength: 5, maxLength: 80 },
     age: { type: Number },
-    CPF: { type: String, required: true, unique: true }, //funcao para validar cpf
+    CPF: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: (v) => validate(v),
+        message: "CPF inválido",
+      },
+    },
     gender: { type: String },
     RG: { type: String },
     email: { type: String, required: true, unique: true, lowercase: true },
@@ -20,6 +29,6 @@ const studentsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Students = mongoose.model("Student", studentsSchema);
+const Student = mongoose.model("Student", studentsSchema);
 
-module.exports = Students;
+module.exports = Student;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Dashboard from '../components/Dashboard.vue'
+import EditClass from '../components/EditClass.vue'
 </script>
 <template>
   <main>
-    <Dashboard />
+    <EditClass />
   </main>
 </template>

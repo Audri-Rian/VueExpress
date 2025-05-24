@@ -3,6 +3,6 @@ import Dashboard from '../components/Dashboard.vue'
 </script>
 <template>
   <main>
-    <Dashboard />
+    <Dashboard class="rounded-3xl"/>
   </main>
 </template>

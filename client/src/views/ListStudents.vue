@@ -3,6 +3,6 @@ import ListStudents from '../components/ListStudents.vue'
 </script>
 <template>
   <main>
-    <ListStudents/>
+    <ListStudents class="rounded-3xl"/>
   </main>
 </template>

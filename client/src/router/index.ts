@@ -19,6 +19,21 @@ const router = createRouter({
       name: 'listadealunos',
       component: () => import('../views/ListStudents.vue'),
     },
+    {
+      path: '/createcurse',
+      name: 'createcurse',
+      component: () =>import ('../views/CreateCurse.vue')
+    },
+    {
+      path: '/notas',
+      name: 'notas',
+      component: () =>import ('../views/EditNotes.vue')
+    },
+    {
+      path: '/frequencia',
+      name: 'frequencia',
+      component: () =>import ('../views/EditFrequency.vue')
+    },
   ],
 })
 

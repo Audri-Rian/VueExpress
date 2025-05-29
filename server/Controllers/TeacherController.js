@@ -1,4 +1,5 @@
 const Teacher = require("../models/Teacher.js");
+const mongoose = require("mongoose");
 
 exports.create = async (req, res) => {
   try {
@@ -65,3 +66,5 @@ exports.delete = async (req, res) => {
     res.status(500).json({ error: "Erro ao deletar professor" });
   }
 };
+
+// implementar mais tratamentos deixando mais robusto as API´S

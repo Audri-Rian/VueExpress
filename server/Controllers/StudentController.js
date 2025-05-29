@@ -1,4 +1,5 @@
 const Student = require("../models/Student");
+const mongoose = require("mongoose");
 
 exports.create = async (req, res) => {
   try {
@@ -41,3 +42,5 @@ exports.delete = async (req, res) => {
     return res.status(201).json("Aluno excluído com sucesso", student);
   } catch (error) {}
 };
+
+// implementar mais tratamentos deixando mais robusto as API´S

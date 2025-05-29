@@ -2,8 +2,11 @@ const mongoose = require("mongoose");
 
 const classSchema = new mongoose.Schema(
   {
-    code: { type: String, required: true, unique: true }, //codigo da turma
-    course: { type: String, required: true },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+      required: true,
+    },
     teacher: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Teacher", // vai ser chamado quando for usar o populate
@@ -13,7 +16,6 @@ const classSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student", // vai ser chamado quando for usar o populate
-        required: true,
       },
     ],
   },

@@ -51,4 +51,68 @@ exports.create = async (req, res) => {
   }
 };
 
+exports.findAll = async (req, res) => {
+  try {
+    const courses = await Course.find();
+    res.json(courses);
+  } catch (error) {
+    console.error("Erro ao buscar cursos", error);
+    res.status(500).json({ error: "Erro interno ao buscar cursos" });
+  }
+};
+
+exports.findOne = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.status(404).json({ error: "Curso não encontrado" });
+    }
+    res.json(course);
+  } catch (error) {
+    console.error("Erro ao buscar curso", error);
+    res.status(500).json({ error: "Erro interno ao buscar curso" });
+  }
+};
+
+exports.update = async (req, res) => {
+  try {
+    const { title, description, code, duration } = req.body;
+    
+    const updatedCourse = await Course.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        description,
+        code,
+        duration
+      },
+      { new: true }
+    );
+
+    if (!updatedCourse) {
+      return res.status(404).json({ error: "Curso não encontrado" });
+    }
+
+    res.json(updatedCourse);
+  } catch (error) {
+    console.error("Erro ao atualizar curso", error);
+    res.status(500).json({ error: "Erro interno ao atualizar curso" });
+  }
+};
+
+exports.remove = async (req, res) => {
+  try {
+    const deletedCourse = await Course.findByIdAndDelete(req.params.id);
+    
+    if (!deletedCourse) {
+      return res.status(404).json({ error: "Curso não encontrado" });
+    }
+
+    res.json({ message: "Curso removido com sucesso" });
+  } catch (error) {
+    console.error("Erro ao remover curso", error);
+    res.status(500).json({ error: "Erro interno ao remover curso" });
+  }
+};
+
 //criar o restante

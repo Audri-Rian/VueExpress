@@ -4,7 +4,7 @@ const { populate } = require("../models/Frequency");
 
 exports.create = async (req, res) => {
   try {
-    const { course: courseId, title, description, code, duration } = req.body;
+    const { title, description, code, duration } = req.body;
 
     if (!title || !code) {
       return res
@@ -21,7 +21,6 @@ exports.create = async (req, res) => {
     }
 
     const newCourse = await Course.create({
-      course: courseId,
       title,
       description,
       code,
@@ -60,7 +59,7 @@ exports.findAll = async (req, res) => {
 
 exports.findOne = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findById(req.params.id).populate('classes');
     if (!course) {
       return res.status(404).json({ error: "Curso não encontrado" });
     }

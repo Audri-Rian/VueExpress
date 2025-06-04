@@ -12,8 +12,7 @@ const courseSchema = new mongoose.Schema(
     description: {
       type: String,
       required: [true, "A descrição é obrigatória"],
-      trim: true,
-      minlength: [50, "A descrição precisa ter pelo menos 50 caracteres"],
+      trim: true
     },
     code: {
       type: String,
@@ -26,6 +25,10 @@ const courseSchema = new mongoose.Schema(
       required: true,
       min: 4,
     },
+    classes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Class'
+    }]
   },
   {
     timestamps: true,

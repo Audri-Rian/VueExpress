@@ -1,5 +1,6 @@
 const Course = require("../models/Course");
 const mongoose = require("mongoose");
+const { populate } = require("../models/Frequency");
 
 exports.create = async (req, res) => {
   try {
@@ -11,11 +12,7 @@ exports.create = async (req, res) => {
         .json({ error: "Titulo e código do curso são obrigatórios" });
     }
 
-    const existingRecord = await Course.findOne({
-      course: courseId,
-      title,
-      code,
-    });
+    const existingRecord = await Course.findOne({ title, code });
 
     if (existingRecord) {
       return res.status(400).json({
@@ -77,14 +74,14 @@ exports.findOne = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { title, description, code, duration } = req.body;
-    
+
     const updatedCourse = await Course.findByIdAndUpdate(
       req.params.id,
       {
         title,
         description,
         code,
-        duration
+        duration,
       },
       { new: true }
     );
@@ -103,7 +100,7 @@ exports.update = async (req, res) => {
 exports.remove = async (req, res) => {
   try {
     const deletedCourse = await Course.findByIdAndDelete(req.params.id);
-    
+
     if (!deletedCourse) {
       return res.status(404).json({ error: "Curso não encontrado" });
     }

@@ -36,13 +36,20 @@ exports.findAll = async (req, res) => {
 exports.findById = async (req, res) => {
   const id = req.params.id;
   try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "ID inválido" });
+    }
     const classes = await Class.findById(id)
       .populate("teacher")
       .populate("students");
 
+    if (!classes) {
+      res.status(404).json({ error: "Não foi encontrado nenhuma classe" });
+    }
+
     res.status(200).json(classes);
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar turma" });
+    res.status(500).json({ message: "Erro ao buscar turma" });
   }
 };
 
@@ -50,16 +57,21 @@ exports.update = async (req, res) => {
   const id = req.params.id;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "ID inválido" });
+    }
     const updateClasses = await Class.findByIdAndUpdate(id, req.body, {
       new: true,
+      runValidators: true,
     });
 
     if (!updateClasses) {
       return res.status(404).json({ message: "Turma não encontrada" });
     }
 
-    return res.json(updateClasses);
+    return res.status(200).json(updateClasses);
   } catch (error) {
+    console.error("erro ao atualizar turma: ", error);
     res.status(500).json({ error: "Erro ao atualizar turma" });
   }
 };
@@ -68,6 +80,9 @@ exports.delete = async (req, res) => {
   const id = req.params.id;
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "ID inválido" });
+    }
     const deleteClass = await Class.findByIdAndDelete(id);
 
     if (!deleteClass) {
@@ -76,6 +91,7 @@ exports.delete = async (req, res) => {
 
     return res.json({ message: "Turma deletada com sucesso" });
   } catch (error) {
+    console.error("erro ao deletar turma: ", error);
     res.status(500).json({ error: "Erro ao deletar turma" });
   }
 };

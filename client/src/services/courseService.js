@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3000/api';
 
-const courseService = {
+export const courseService = {
     // Configuração de novo curso caraio
     async createCourse(courseData) {
         try {
@@ -18,11 +18,15 @@ const courseService = {
     async getAllCourses() {
         try {
             const response = await axios.get(`${API_URL}/courses`);
-            console.log('Cursos carregados:', response.data); // Log para debug
             return response.data;
         } catch (error) {
-            console.error('Erro ao carregar cursos:', error); // Log para debug
-            throw new Error(error.response?.data?.message || 'Erro ao carregar cursos');
+            if (error.response) {
+                throw new Error(error.response.data.error || 'Erro ao buscar cursos');
+            } else if (error.request) {
+                throw new Error('Erro de conexão ao buscar cursos');
+            } else {
+                throw new Error('Erro ao processar requisição');
+            }
         }
     },
 
@@ -32,7 +36,13 @@ const courseService = {
             const response = await axios.get(`${API_URL}/courses/${id}`);
             return response.data;
         } catch (error) {
-            throw new Error(error.response?.data?.message || 'Erro ao carregar curso');
+            if (error.response) {
+                throw new Error(error.response.data.error || 'Erro ao buscar curso');
+            } else if (error.request) {
+                throw new Error('Erro de conexão ao buscar curso');
+            } else {
+                throw new Error('Erro ao processar requisição');
+            }
         }
     },
 
@@ -55,6 +65,4 @@ const courseService = {
             throw new Error(error.response?.data?.message || 'Erro ao excluir curso');
         }
     }
-};
-
-export { courseService }; 
+}; 

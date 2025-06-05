@@ -2,20 +2,36 @@ const mongoose = require("mongoose");
 
 const classSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      required: true,
+    },
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
       required: true,
     },
+    period: {
+      type: String,
+      required: true,
+    },
+    year: {
+      type: Number,
+      required: true,
+    },
+    shift: {
+      type: String,
+      enum: ['Matutino', 'Vespertino', 'Noturno'],
+      required: true,
+    },
     teacher: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Teacher", // vai ser chamado quando for usar o populate
-      required: true,
+      ref: "Teacher",
     },
     students: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Student", // vai ser chamado quando for usar o populate
+        ref: "Student",
       },
     ],
   },

@@ -3,13 +3,16 @@ const mongoose = require("mongoose");
 
 exports.create = async (req, res) => {
   try {
-    if (!req.body.name || !req.body.teacher) {
-      return res
-        .status(400)
-        .json({ error: "Nome e professor são obrigatórios" });
+    const requiredFields = ['name', 'course', 'period', 'year', 'shift'];
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+    
+    if (missingFields.length > 0) {
+      return res.status(400).json({ 
+        error: `Campos obrigatórios faltando: ${missingFields.join(', ')}` 
+      });
     }
-    const newClass = await Class.create(req.body);
 
+    const newClass = await Class.create(req.body);
     res.status(201).json(newClass);
   } catch (error) {
     console.error("ERRO COMPLETO", error);
@@ -25,7 +28,9 @@ exports.create = async (req, res) => {
 
 exports.findAll = async (req, res) => {
   try {
-    const classes = await Class.find().populate("teacher").populate("students");
+    const classes = await Class.find()
+      .populate("course")
+      .populate("students");
 
     res.status(200).json(classes);
   } catch (error) {
@@ -40,11 +45,11 @@ exports.findById = async (req, res) => {
       return res.status(400).json({ error: "ID inválido" });
     }
     const classes = await Class.findById(id)
-      .populate("teacher")
+      .populate("course")
       .populate("students");
 
     if (!classes) {
-      res.status(404).json({ error: "Não foi encontrado nenhuma classe" });
+      return res.status(404).json({ error: "Não foi encontrado nenhuma classe" });
     }
 
     res.status(200).json(classes);
@@ -60,6 +65,16 @@ exports.update = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "ID inválido" });
     }
+
+    const requiredFields = ['name', 'course', 'period', 'year', 'shift'];
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+    
+    if (missingFields.length > 0) {
+      return res.status(400).json({ 
+        error: `Campos obrigatórios faltando: ${missingFields.join(', ')}` 
+      });
+    }
+
     const updateClasses = await Class.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,

@@ -20,10 +20,12 @@ const courseSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    duration: {
+    periods: {
       type: Number,
       required: true,
-      min: 4,
+      min: 1,
+      max: 12,
+      default: 1
     },
     classes: [{
       type: mongoose.Schema.Types.ObjectId,

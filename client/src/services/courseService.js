@@ -3,14 +3,14 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3000/api';
 
-export const courseService = {
+const courseService = {
     // Configuração de novo curso caraio
     async createCourse(courseData) {
         try {
             const response = await axios.post(`${API_URL}/courses`, courseData);
             return response.data;
         } catch (error) {
-            throw this.handleError(error);
+            throw new Error(error.response?.data?.message || 'Erro ao criar curso');
         }
     },
 
@@ -18,19 +18,21 @@ export const courseService = {
     async getAllCourses() {
         try {
             const response = await axios.get(`${API_URL}/courses`);
+            console.log('Cursos carregados:', response.data); // Log para debug
             return response.data;
         } catch (error) {
-            throw this.handleError(error);
+            console.error('Erro ao carregar cursos:', error); // Log para debug
+            throw new Error(error.response?.data?.message || 'Erro ao carregar cursos');
         }
     },
 
     // Buscar um curso caraio
-    async getCourse(id) {
+    async getCourseById(id) {
         try {
             const response = await axios.get(`${API_URL}/courses/${id}`);
             return response.data;
         } catch (error) {
-            throw this.handleError(error);
+            throw new Error(error.response?.data?.message || 'Erro ao carregar curso');
         }
     },
 
@@ -40,7 +42,7 @@ export const courseService = {
             const response = await axios.put(`${API_URL}/courses/${id}`, courseData);
             return response.data;
         } catch (error) {
-            throw this.handleError(error);
+            throw new Error(error.response?.data?.message || 'Erro ao atualizar curso');
         }
     },
 
@@ -50,28 +52,9 @@ export const courseService = {
             const response = await axios.delete(`${API_URL}/courses/${id}`);
             return response.data;
         } catch (error) {
-            throw this.handleError(error);
-        }
-    },
-
-    handleError(error) {
-        if (error.response) {
-            return {
-                message: error.response.data.error || 'Erro na operação',
-                status: error.response.status
-            };
-        } else if (error.request) {
-
-            return {
-                message: 'Não foi possível conectar ao servidor',
-                status: 0
-            };
-        } else {
-
-            return {
-                message: 'Erro ao processar a requisição',
-                status: 0
-            };
+            throw new Error(error.response?.data?.message || 'Erro ao excluir curso');
         }
     }
-}; 
+};
+
+export { courseService }; 

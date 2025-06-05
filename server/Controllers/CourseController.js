@@ -4,12 +4,12 @@ const { populate } = require("../models/Frequency");
 
 exports.create = async (req, res) => {
   try {
-    const { title, description, code, duration } = req.body;
+    const { title, description, code, periods } = req.body;
 
-    if (!title || !code) {
+    if (!title || !code || !periods) {
       return res
         .status(400)
-        .json({ error: "Titulo e código do curso são obrigatórios" });
+        .json({ error: "Título, código e número de períodos do curso são obrigatórios" });
     }
 
     const existingRecord = await Course.findOne({ title, code });
@@ -24,7 +24,7 @@ exports.create = async (req, res) => {
       title,
       description,
       code,
-      duration,
+      periods
     });
 
     res.status(201).json(newCourse);
@@ -72,7 +72,7 @@ exports.findOne = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const { title, description, code, duration } = req.body;
+    const { title, description, code, periods } = req.body;
 
     const updatedCourse = await Course.findByIdAndUpdate(
       req.params.id,
@@ -80,7 +80,7 @@ exports.update = async (req, res) => {
         title,
         description,
         code,
-        duration,
+        periods
       },
       { new: true }
     );

@@ -2,13 +2,13 @@
     <div class="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <!-- Main Content -->
         <div class="flex-1 overflow-y-auto">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="max-w-8xl mx-auto px-6 sm:px-8 lg:px-10 py-8">
                 <!-- Header -->
-                <div class="text-center mb-8">
-                    <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
+                <div class="text-center mb-12">
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
                         {{ editingCourse ? 'Editar Curso' : 'Cadastro de Curso' }}
                     </h1>
-                    <p class="text-gray-600 mt-2">
+                    <p class="text-gray-600 mt-3 text-lg">
                         Sistema completo para gerenciar cursos acadêmicos
                     </p>
                 </div>
@@ -33,9 +33,9 @@
                 </transition>
 
                 <!-- Grid Layout -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- Form Card -->
-                    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/30 p-6 form-card">
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/30 p-8 form-card">
                         <div class="flex items-center justify-between mb-6">
                             <div>
                                 <h2 class="text-xl font-bold text-gray-900">
@@ -74,11 +74,11 @@
                                 </div>
 
                                 <div class="space-y-2">
-                                    <label class="block text-sm font-semibold text-gray-700">Duração (semestres) <span class="text-red-500">*</span></label>
-                                    <input v-model.number="form.duration" type="number" min="4" placeholder="Ex: 8"
+                                    <label class="block text-sm font-semibold text-gray-700">Número de Períodos <span class="text-red-500">*</span></label>
+                                    <input v-model.number="form.periods" type="number" min="1" max="12" placeholder="Ex: 4"
                                         class="w-full bg-white/70 border-2 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                                        :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': errors.duration, 'border-gray-200': !errors.duration }">
-                                    <p v-if="errors.duration" class="text-red-500 text-xs">Duração mínima de 4 semestres</p>
+                                        :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500/20': errors.periods, 'border-gray-200': !errors.periods }">
+                                    <p v-if="errors.periods" class="text-red-500 text-xs">Número de períodos deve estar entre 1 e 12</p>
                                 </div>
                             </div>
 
@@ -118,7 +118,7 @@
                     </div>
 
                     <!-- Courses List Card -->
-                    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/30 p-6">
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/30 p-8">
                         <div class="flex items-center justify-between mb-6">
                             <div>
                                 <h2 class="text-xl font-bold text-gray-900">
@@ -153,15 +153,15 @@
                         </div>
 
                         <!-- Courses List -->
-                        <div v-else class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                        <div v-else class="space-y-4 max-h-[600px] overflow-y-auto pr-3">
                             <div v-for="course in filteredCourses" :key="course._id" 
-                                class="bg-white rounded-lg border border-gray-100 p-4 hover:shadow-md transition-all duration-200">
+                                class="bg-white rounded-lg border border-gray-100 p-6 hover:shadow-md transition-all duration-200">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1 min-w-0">
                                         <h3 class="font-semibold text-gray-900 truncate">{{ course.title }}</h3>
                                         <div class="flex items-center mt-1 space-x-2">
                                             <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">{{ course.code }}</span>
-                                            <span class="text-xs text-gray-500">{{ course.duration }} semestres</span>
+                                            <span class="text-xs text-gray-500">{{ course.periods }} períodos</span>
                                         </div>
                                         <p v-if="course.description" class="text-sm text-gray-600 mt-2 line-clamp-2">
                                             {{ course.description }}
@@ -194,6 +194,44 @@
                 </div>
             </div>
         </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 transform transition-all">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">
+                    Confirmar Exclusão
+                </h3>
+                
+                <p class="text-gray-600 text-center mb-6">
+                    Tem certeza que deseja excluir o curso <span class="font-semibold">{{ courseToDelete?.title }}</span>?
+                    Esta ação não poderá ser desfeita.
+                </p>
+
+                <div class="flex gap-3">
+                    <button @click="showDeleteModal = false" 
+                        class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-all duration-200 flex items-center justify-center font-semibold border border-gray-200">
+                        Cancelar
+                    </button>
+                    <button @click="confirmDelete" 
+                        class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all duration-200 flex items-center justify-center font-semibold"
+                        :disabled="loading">
+                        <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -208,13 +246,13 @@ export default {
                 title: '',
                 code: '',
                 description: '',
-                duration: null,
+                periods: 1,
             },
             errors: {
                 title: false,
                 code: false,
-                duration: false,
-                description: false
+                description: false,
+                periods: false
             },
             toastMessage: '',
             showToast: false,
@@ -222,7 +260,9 @@ export default {
             searchQuery: '',
             courses: [],
             loading: false,
-            editingCourse: null
+            editingCourse: null,
+            showDeleteModal: false,
+            courseToDelete: null
         };
     },
     computed: {
@@ -257,8 +297,8 @@ export default {
             this.errors = {
                 title: !this.form.title,
                 code: !this.form.code || this.form.code.length < 2,
-                duration: !this.form.duration || this.form.duration < 4,
-                description: !this.form.description
+                description: !this.form.description,
+                periods: !this.form.periods || this.form.periods < 1 || this.form.periods > 12
             };
 
             if (Object.values(this.errors).some(v => v)) {
@@ -285,17 +325,24 @@ export default {
         },
 
         async deleteCourse(id) {
-            if (!confirm('Tem certeza que deseja excluir este curso?')) return;
+            this.courseToDelete = this.courses.find(course => course._id === id);
+            this.showDeleteModal = true;
+        },
+
+        async confirmDelete() {
+            if (!this.courseToDelete) return;
 
             try {
                 this.loading = true;
-                await courseService.deleteCourse(id);
+                await courseService.deleteCourse(this.courseToDelete._id);
                 this.showToastMessage('Curso excluído com sucesso!', false);
                 await this.loadCourses();
             } catch (error) {
                 this.showToastMessage(error.message, true);
             } finally {
                 this.loading = false;
+                this.showDeleteModal = false;
+                this.courseToDelete = null;
             }
         },
 
@@ -305,7 +352,7 @@ export default {
                 title: course.title,
                 code: course.code,
                 description: course.description,
-                duration: course.duration
+                periods: course.periods
             };
             // Scroll para o formulário
             this.$nextTick(() => {
@@ -324,7 +371,7 @@ export default {
         },
 
         resetForm() {
-            this.form = { title: '', code: '', description: '', duration: null };
+            this.form = { title: '', code: '', description: '', periods: 1 };
             this.errors = {};
             this.editingCourse = null;
         }
@@ -412,7 +459,29 @@ button:hover::before {
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* Modal Animation */
+.modal-enter-active,
+.modal-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+    opacity: 0;
+}
+
+.modal-enter-active .modal-content,
+.modal-leave-active .modal-content {
+    transition: transform 0.3s ease;
+}
+
+.modal-enter-from .modal-content,
+.modal-leave-to .modal-content {
+    transform: scale(0.95);
 }
 </style>

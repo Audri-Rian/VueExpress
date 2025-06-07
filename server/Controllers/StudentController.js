@@ -1,107 +1,220 @@
+require("dotenv").config();
 const Student = require("../models/Student");
 const Course = require("../models/Course");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 
-exports.create = async (req, res) => {
+exports.register = async (req, res) => {
   try {
-    // Validação dos campos obrigatórios
-    const requiredFields = ['name', 'CPF', 'email', 'course', 'age', 'gender', 'RG', 'phone'];
-    const missingFields = requiredFields.filter(field => !req.body[field]);
-    
+    // Define os campos obrigatórios para validação
+    const requiredFields = [
+      "name",
+      "CPF",
+      "email",
+      "course",
+      "age",
+      "gender",
+      "RG",
+      "phone",
+      "password",
+    ];
+    // Verifica se há campos obrigatórios faltando
+    const missingFields = requiredFields.filter((field) => !req.body[field]);
     if (missingFields.length > 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Erro de validação",
         message: "Campos obrigatórios não preenchidos",
         details: missingFields.reduce((acc, field) => {
-          acc[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} é obrigatório`;
+          acc[field] = `${
+            field.charAt(0).toUpperCase() + field.slice(1)
+          } é obrigatório`;
           return acc;
-        }, {})
+        }, {}),
       });
     }
 
     // Verifica se o curso existe
     const courseExists = await Course.findById(req.body.course);
     if (!courseExists) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Erro de validação",
         message: "Curso não encontrado",
-        details: { course: "Curso selecionado não existe" }
+        details: { course: "Curso selecionado não existe" },
       });
     }
 
-    // Verifica se já existe um aluno com o mesmo CPF
-    const existingCPF = await Student.findOne({ CPF: req.body.CPF });
-    if (existingCPF) {
-      return res.status(400).json({ 
-        error: "CPF duplicado",
-        message: "Já existe um aluno cadastrado com este CPF",
-        field: "CPF"
-      });
-    }
-
-    // Verifica se já existe um aluno com o mesmo email
-    const existingEmail = await Student.findOne({ email: req.body.email.toLowerCase() });
+    const existingEmail = await Student.findOne({
+      email: req.body.email.toLowerCase(),
+    });
     if (existingEmail) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Email duplicado",
         message: "Já existe um aluno cadastrado com este email",
-        field: "email"
+        field: "email",
+      });
+    }
+
+    const existingCPF = await Student.findOne({ CPF: req.body.CPF });
+    if (existingCPF) {
+      return res.status(400).json({
+        error: "CPF duplicado",
+        message: "Já existe um aluno cadastrado com este CPF",
+        field: "CPF",
       });
     }
 
     // Validação do endereço
-    if (!req.body.address || !req.body.address.street || !req.body.address.city || 
-        !req.body.address.state || !req.body.address.zipCode) {
+    if (
+      !req.body.address ||
+      !req.body.address.street ||
+      !req.body.address.city ||
+      !req.body.address.state ||
+      !req.body.address.zipCode
+    ) {
       return res.status(400).json({
         error: "Erro de validação",
         message: "Endereço incompleto",
         details: {
-          "address.street": !req.body.address?.street ? "Rua é obrigatória" : "",
+          "address.street": !req.body.address?.street
+            ? "Rua é obrigatória"
+            : "",
           "address.city": !req.body.address?.city ? "Cidade é obrigatória" : "",
-          "address.state": !req.body.address?.state ? "Estado é obrigatório" : "",
-          "address.zipCode": !req.body.address?.zipCode ? "CEP é obrigatório" : ""
-        }
+          "address.state": !req.body.address?.state
+            ? "Estado é obrigatório"
+            : "",
+          "address.zipCode": !req.body.address?.zipCode
+            ? "CEP é obrigatório"
+            : "",
+        },
       });
     }
 
     // Gera a matrícula
     const year = new Date().getFullYear();
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const random = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
     const registration = `${year}${random}`;
 
-    // Cria o aluno com a matrícula gerada
     const newStudent = await Student.create({
       ...req.body,
-      registration
+      registration,
+      email: req.body.email.toLowerCase(),
     });
 
-    const populatedStudent = await Student.findById(newStudent._id).populate('course');
+    const payload = {
+      id: newStudent._id,
+      name: newStudent.name,
+      email: newStudent.email,
+      role: "student",
+    };
 
-    return res.status(201).json(populatedStudent);
+    if (!process.env.JWT_SECRET) {
+      throw new Error("Chave JWT não configurada");
+    }
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "1h",
+    });
+
+    console.log("JWT_SECRET carregado:", process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "1h",
+    });
+
+    return res.status(201).json({
+      success: true,
+      token,
+      user: {
+        id: newStudent._id,
+        name: newStudent.name,
+        email: newStudent.email,
+        role: "student",
+      },
+    });
   } catch (error) {
-    console.error("Erro ao criar aluno:", error);
+    console.error("ERRO NO REGISTRO", error);
     if (error.name === "ValidationError") {
       const validationErrors = {};
       for (let field in error.errors) {
         validationErrors[field] = error.errors[field].message;
       }
-      return res.status(400).json({ 
-        error: "Erro de validação", 
+      return res.status(400).json({
+        error: "Erro de validação",
         details: validationErrors,
-        message: "Por favor, verifique os campos obrigatórios"
+        message: "Por favor, verifique os campos obrigatórios",
       });
     }
 
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
-      const fieldName = field === 'CPF' ? 'CPF' : 'email';
-      return res.status(400).json({ 
+      const fieldName = field === "CPF" ? "CPF" : "email";
+      return res.status(400).json({
         error: `${fieldName} duplicado`,
         message: `Já existe um aluno cadastrado com este ${fieldName}`,
-        field: fieldName
+        field: fieldName,
       });
     }
-    res.status(500).json({ error: "Erro ao criar aluno" });
+
+    return res.status(500).json({
+      error: "Erro ao criar aluno",
+      details: error.message,
+    });
+  }
+};
+
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ msg: "Email e senha são obrigatórios" });
+    }
+
+    const student = await Student.findOne({
+      email: email.toLowerCase(),
+    }).select("+password");
+    if (!student) {
+      return res.status(401).json({ msg: "Credenciais inválidas" });
+    }
+
+    const isMatch = await student.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ msg: "Senha incorreta" });
+    }
+
+    const payload = {
+      id: student._id,
+      name: student.name,
+      email: student.email,
+      role: "student",
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "1h",
+    });
+
+    return res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: student._id,
+        name: student.name,
+        email: student.email,
+        course: student.course,
+        role: "student",
+      },
+    });
+  } catch (error) {
+    console.error("Erro no login do aluno:", error);
+    if (error.name === "ValidationError") {
+      return res
+        .status(400)
+        .json({ msg: "Erro de validação", details: error.message });
+    }
+    if (error instanceof mongoose.Error) {
+      return res.status(500).json({ msg: "Erro ao acessar o banco de dados" });
+    }
+    return res.status(500).json({ msg: "Erro interno no servidor" });
   }
 };
 
@@ -115,10 +228,12 @@ exports.findOne = async (req, res) => {
 
     const student = await Student.findOne({
       name: { $regex: name, $options: "i" },
-    }).populate('course');
+    }).populate("course");
 
     if (!student) {
-      return res.status(404).json({ msg: "Nenhum aluno encontrado com esse nome" });
+      return res
+        .status(404)
+        .json({ msg: "Nenhum aluno encontrado com esse nome" });
     }
 
     res.status(200).json(student);
@@ -130,7 +245,7 @@ exports.findOne = async (req, res) => {
 
 exports.findAll = async (req, res) => {
   try {
-    const students = await Student.find().populate('course');
+    const students = await Student.find().populate("course");
 
     if (!students) {
       return res.status(404).json({ msg: "Nenhum aluno encontrado" });
@@ -160,7 +275,7 @@ exports.update = async (req, res) => {
 
     const student = await Student.findByIdAndUpdate(id, req.body, {
       new: true,
-    }).populate('course');
+    }).populate("course");
 
     if (!student) {
       return res.status(404).json({ msg: "Nenhum aluno encontrado" });

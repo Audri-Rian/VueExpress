@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -10,6 +11,7 @@ const teacherRoutes = require("../server/Routes/teacherRoutes");
 const studentRoutes = require("../server/Routes/studentRoutes");
 const classRoutes = require("../server/Routes/classRoutes");
 const courseRoutes = require("../server/Routes/courseRoutes");
+const { cpf } = require("cpf-cnpj-validator");
 
 //conectar ao mongoDB
 connectToDatabase();

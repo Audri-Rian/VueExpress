@@ -113,4 +113,28 @@ exports.remove = async (req, res) => {
   }
 };
 
+// Buscar alunos por curso
+exports.getStudentsByCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('ID do curso recebido:', id);
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.log('ID do curso inválido');
+      return res.status(400).json({ error: "ID do curso inválido" });
+    }
+
+    // Buscar alunos diretamente pelo curso
+    const Student = require('../models/Student');
+    const students = await Student.find({ course: id })
+      .select('name registration');
+
+    console.log('Total de alunos encontrados:', students.length);
+    res.json(students);
+  } catch (error) {
+    console.error("Erro ao buscar alunos do curso:", error);
+    res.status(500).json({ error: "Erro interno ao buscar alunos do curso" });
+  }
+};
+
 //criar o restante

@@ -124,3 +124,22 @@ exports.deleteDiscipline = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Buscar disciplinas por curso
+exports.getDisciplinesByCourse = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({ error: "ID do curso inválido" });
+    }
+    const disciplines = await Discipline.find({ cursoId: courseId })
+      .populate({
+        path: 'cursoId',
+        select: 'title code'
+      });
+    res.json(disciplines);
+  } catch (error) {
+    console.error("Erro ao buscar disciplinas do curso:", error);
+    res.status(500).json({ error: "Erro interno ao buscar disciplinas do curso" });
+  }
+};

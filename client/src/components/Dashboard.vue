@@ -46,6 +46,7 @@ const alunosChartRef = ref<HTMLCanvasElement | null>(null)
 const notasChartRef = ref<HTMLCanvasElement | null>(null)
 const frequenciaChartRef = ref<HTMLCanvasElement | null>(null)
 const alunosPorCursoPizzaRef = ref<HTMLCanvasElement | null>(null)
+const notasPorDisciplinaRef = ref<HTMLCanvasElement | null>(null)
 
 onMounted(async () => {
   try {
@@ -210,6 +211,58 @@ onMounted(async () => {
         }
       })
     }
+
+    // Buscar dados para o gráfico de notas por disciplina
+    const notasPorDisciplinaResponse = await fetch('http://localhost:3000/api/dashboard/notes/by-discipline')
+    const notasPorDisciplinaData = await notasPorDisciplinaResponse.json()
+
+    // Atualizar gráfico de notas por disciplina
+    if (notasPorDisciplinaRef.value) {
+      new Chart(notasPorDisciplinaRef.value, {
+        type: 'bar',
+        data: {
+          labels: notasPorDisciplinaData.map((item: any) => item.disciplineName),
+          datasets: [{
+            label: 'Média de Notas',
+            data: notasPorDisciplinaData.map((item: any) => item.average),
+            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+            borderColor: 'rgb(16, 185, 129)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Média de Notas por Disciplina',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 10,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      })
+    }
   } catch (error) {
     console.error('Erro ao carregar dados:', error)
   }
@@ -277,6 +330,11 @@ onMounted(async () => {
       <!-- Gráfico de Distribuição de Alunos por Curso (Pizza) -->
       <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 h-[350px]">
         <canvas ref="alunosPorCursoPizzaRef"></canvas>
+      </div>
+
+      <!-- Gráfico de Média de Notas por Disciplina -->
+      <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 h-[350px]">
+        <canvas ref="notasPorDisciplinaRef"></canvas>
       </div>
 
       <!-- Container para Futuros Gráficos -->

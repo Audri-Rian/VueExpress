@@ -25,6 +25,17 @@ export const courseService = {
         }
     },
 
+    // Buscar alunos por curso
+    async getStudentsByCourse(courseId) {
+        try {
+            const response = await axios.get(`${API_URL}/${courseId}/students`);
+            return response.data;
+        } catch (error) {
+            console.error('Erro ao buscar alunos do curso:', error);
+            throw new Error(error.response?.data?.error || 'Erro ao buscar alunos do curso');
+        }
+    },
+
     // Buscar um curso caraio
     async getCourseById(id) {
         try {

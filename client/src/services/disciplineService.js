@@ -14,6 +14,16 @@ export const disciplineService = {
     }
   },
 
+  async getDisciplinesByCourse(courseId) {
+    try {
+      const response = await axios.get(`${API_URL}/course/${courseId}`)
+      return response.data
+    } catch (error) {
+      console.error('Erro ao buscar disciplinas do curso:', error)
+      throw new Error(error.response?.data?.error || 'Erro ao buscar disciplinas do curso')
+    }
+  },
+
   async getDisciplineById(id) {
     try {
       const response = await axios.get(`${API_URL}/${id}`)

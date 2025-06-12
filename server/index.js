@@ -13,6 +13,7 @@ const classRoutes = require("./Routes/classRoutes");
 const courseRoutes = require("./Routes/courseRoutes");
 const disciplineRoutes = require("./Routes/disciplineRoutes");
 const frequencyRoutes = require("./Routes/frequencyRoutes");
+const noteRoutes = require("./routes/noteRoutes");
 const { cpf } = require("cpf-cnpj-validator");
 const statsRoutes = require("./routes/stats");
 
@@ -30,6 +31,8 @@ app.use("/api/classes", classRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/disciplines", disciplineRoutes);
 app.use("/api/frequencies", frequencyRoutes);
+app.use("/api/notes", noteRoutes);
+app.use("/api", statsRoutes);
 
 //inicia o servidor
 app.listen(port, () => {

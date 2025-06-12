@@ -3,6 +3,7 @@ const router = express.Router();
 const Student = require('../models/Student');
 const Class = require('../models/Class');
 const Course = require('../models/Course');
+const Notes = require('../models/Notes');
 const mongoose = require('mongoose');
 
 // Contar total de alunos
@@ -115,6 +116,43 @@ router.get('/dashboard/classes/by-shift', async (req, res) => {
     ]);
     res.json(classesByShift);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Média de notas por disciplina
+router.get('/dashboard/notes/by-discipline', async (req, res) => {
+  try {
+    const notesByDiscipline = await Notes.aggregate([
+      {
+        $lookup: {
+          from: 'disciplines',
+          localField: 'discipline',
+          foreignField: '_id',
+          as: 'disciplineInfo'
+        }
+      },
+      {
+        $unwind: '$disciplineInfo'
+      },
+      {
+        $group: {
+          _id: '$discipline',
+          average: { $avg: '$value' },
+          disciplineName: { $first: '$disciplineInfo.name' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          disciplineName: 1,
+          average: { $round: ['$average', 2] }
+        }
+      }
+    ]);
+    res.json(notesByDiscipline);
+  } catch (error) {
+    console.error('Erro ao buscar médias por disciplina:', error);
     res.status(500).json({ message: error.message });
   }
 });

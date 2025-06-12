@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 const { cpf } = require("cpf-cnpj-validator");
 
 const studentsSchema = new mongoose.Schema(
@@ -69,7 +68,6 @@ const studentsSchema = new mongoose.Schema(
         required: [true, "CEP é obrigatório"],
       },
     },
-    password: { type: String, required: true },
     role: {
       type: String,
       default: "student",
@@ -89,25 +87,6 @@ studentsSchema.pre("validate", function (next) {
   }
   next();
 });
-
-studentsSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    return next();
-  }
-
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    console.error("erro ao hashear senha", error);
-    next(error);
-  }
-});
-
-studentsSchema.methods.comparePassword = async function (passwordInput) {
-  return await bcrypt.compare(passwordInput, this.password);
-};
 
 const Student = mongoose.model("Student", studentsSchema);
 

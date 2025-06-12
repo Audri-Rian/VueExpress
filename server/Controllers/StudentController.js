@@ -2,7 +2,6 @@ require("dotenv").config();
 const Student = require("../models/Student");
 const Course = require("../models/Course");
 const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
@@ -16,7 +15,6 @@ exports.register = async (req, res) => {
       "gender",
       "RG",
       "phone",
-      "password",
     ];
     // Verifica se há campos obrigatórios faltando
     const missingFields = requiredFields.filter((field) => !req.body[field]);
@@ -102,29 +100,9 @@ exports.register = async (req, res) => {
       email: req.body.email.toLowerCase(),
     });
 
-    const payload = {
-      id: newStudent._id,
-      name: newStudent.name,
-      email: newStudent.email,
-      role: "student",
-    };
-
-    if (!process.env.JWT_SECRET) {
-      throw new Error("Chave JWT não configurada");
-    }
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || "1h",
-    });
-
-    console.log("JWT_SECRET carregado:", process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || "1h",
-    });
-
     return res.status(201).json({
       success: true,
-      token,
-      user: {
+      student: {
         id: newStudent._id,
         name: newStudent.name,
         email: newStudent.email,
@@ -159,62 +137,6 @@ exports.register = async (req, res) => {
       error: "Erro ao criar aluno",
       details: error.message,
     });
-  }
-};
-
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ msg: "Email e senha são obrigatórios" });
-    }
-
-    const student = await Student.findOne({
-      email: email.toLowerCase(),
-    }).select("+password");
-    if (!student) {
-      return res.status(401).json({ msg: "Credenciais inválidas" });
-    }
-
-    const isMatch = await student.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ msg: "Senha incorreta" });
-    }
-
-    const payload = {
-      id: student._id,
-      name: student.name,
-      email: student.email,
-      role: "student",
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || "1h",
-    });
-
-    return res.status(200).json({
-      success: true,
-      token,
-      user: {
-        id: student._id,
-        name: student.name,
-        email: student.email,
-        course: student.course,
-        role: "student",
-      },
-    });
-  } catch (error) {
-    console.error("Erro no login do aluno:", error);
-    if (error.name === "ValidationError") {
-      return res
-        .status(400)
-        .json({ msg: "Erro de validação", details: error.message });
-    }
-    if (error instanceof mongoose.Error) {
-      return res.status(500).json({ msg: "Erro ao acessar o banco de dados" });
-    }
-    return res.status(500).json({ msg: "Erro interno no servidor" });
   }
 };
 

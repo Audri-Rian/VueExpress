@@ -5,7 +5,7 @@ const API_URL = 'http://localhost:3000/api'
 export const studentService = {
   async createStudent(studentData) {
     try {
-      const response = await axios.post(`${API_URL}/registerAluno`, studentData)
+      const response = await axios.post(`${API_URL}/students/registerAluno`, studentData)
       return response.data
     } catch (error) {
       if (error.response) {

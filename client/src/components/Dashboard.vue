@@ -2,27 +2,37 @@
 import { ref, onMounted } from 'vue'
 import Chart from 'chart.js/auto'
 
+interface CourseStats {
+  courseTitle: string;
+  count: number;
+}
+
+interface ShiftStats {
+  shift: string;
+  count: number;
+}
+
 const metrics = ref([
   { 
     id: 1, 
     title: 'Total de Alunos', 
-    value: 256, 
+    value: 0, // Será atualizado com dados reais
     trend: 'up',
     icon: 'M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z'
   },
   { 
     id: 2, 
     title: 'Turmas Ativas', 
-    value: '12', 
+    value: 0, // Será atualizado com dados reais
     trend: 'up',
     icon: 'M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5'
   },
   { 
     id: 3, 
-    title: 'Taxa de Aprovação', 
-    value: '89%', 
-    trend: 'stable',
-    icon: 'M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75'
+    title: 'Cursos Ativos', 
+    value: 0, // Será atualizado com dados reais
+    trend: 'up',
+    icon: 'M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5'
   }
 ])
 
@@ -35,142 +45,173 @@ const toggleDetails = () => {
 const alunosChartRef = ref<HTMLCanvasElement | null>(null)
 const notasChartRef = ref<HTMLCanvasElement | null>(null)
 const frequenciaChartRef = ref<HTMLCanvasElement | null>(null)
+const alunosPorCursoPizzaRef = ref<HTMLCanvasElement | null>(null)
 
-onMounted(() => {
-  // Gráfico de Distribuição de Alunos por Curso
-  if (alunosChartRef.value) {
-    new Chart(alunosChartRef.value, {
-      type: 'bar',
-      data: {
-        labels: ['Ciência da Computação', 'Engenharia', 'Administração', 'Direito', 'Medicina'],
-        datasets: [{
-          label: 'Número de Alunos',
-          data: [120, 85, 65, 95, 75],
-          backgroundColor: 'rgba(59, 130, 246, 0.2)',
-          borderColor: 'rgb(59, 130, 246)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'Distribuição de Alunos por Curso',
-            font: {
-              size: 16,
-              weight: 'bold'
-            }
-          }
+onMounted(async () => {
+  try {
+    // Buscar total de alunos
+    const alunosResponse = await fetch('http://localhost:3000/api/dashboard/students/count')
+    const alunosData = await alunosResponse.json()
+    metrics.value[0].value = alunosData.count
+
+    // Buscar total de turmas
+    const turmasResponse = await fetch('http://localhost:3000/api/dashboard/classes/count')
+    const turmasData = await turmasResponse.json()
+    console.log('Dados de turmas recebidos:', turmasData)
+    const turmasCount = typeof turmasData.count === 'number' ? turmasData.count : 0;
+    metrics.value[1].value = turmasCount;
+
+    // Buscar total de cursos
+    const cursosResponse = await fetch('http://localhost:3000/api/dashboard/courses/count')
+    const cursosData = await cursosResponse.json()
+    console.log('Dados de cursos recebidos:', cursosData)
+    const cursosCount = typeof cursosData.count === 'number' ? cursosData.count : 0;
+    metrics.value[2].value = cursosCount;
+
+    // Buscar dados para o gráfico de alunos por curso
+    const alunosPorCursoResponse = await fetch('http://localhost:3000/api/dashboard/students/by-course')
+    const alunosPorCursoData: CourseStats[] = await alunosPorCursoResponse.json()
+
+    // Atualizar gráfico de barras de alunos por curso
+    if (alunosChartRef.value) {
+      new Chart(alunosChartRef.value, {
+        type: 'bar',
+        data: {
+          labels: alunosPorCursoData.map((item: CourseStats) => item.courseTitle),
+          datasets: [{
+            label: 'Número de Alunos',
+            data: alunosPorCursoData.map((item: CourseStats) => item.count),
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgb(59, 130, 246)',
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Distribuição de Alunos por Curso',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
             }
           },
-          x: {
-            grid: {
-              display: false
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
             }
           }
         }
-      }
-    })
-  }
+      })
+    }
 
-  // Gráfico de Notas Médias
-  if (notasChartRef.value) {
-    new Chart(notasChartRef.value, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-        datasets: [{
-          label: 'Nota Média',
-          data: [7.5, 7.8, 8.2, 7.9, 8.4, 8.6],
-          borderColor: 'rgb(34, 197, 94)',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          tension: 0.4,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'Evolução das Notas Médias',
-            font: {
-              size: 16,
-              weight: 'bold'
-            }
-          }
+    // Atualizar gráfico de pizza de alunos por curso
+    if (alunosPorCursoPizzaRef.value) {
+      new Chart(alunosPorCursoPizzaRef.value, {
+        type: 'pie',
+        data: {
+          labels: alunosPorCursoData.map((item: CourseStats) => item.courseTitle),
+          datasets: [{
+            data: alunosPorCursoData.map((item: CourseStats) => item.count),
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.2)',
+              'rgba(16, 185, 129, 0.2)',
+              'rgba(245, 158, 11, 0.2)',
+              'rgba(239, 68, 68, 0.2)',
+              'rgba(139, 92, 246, 0.2)',
+              'rgba(236, 72, 153, 0.2)'
+            ],
+            borderColor: [
+              'rgb(59, 130, 246)',
+              'rgb(16, 185, 129)',
+              'rgb(245, 158, 11)',
+              'rgb(239, 68, 68)',
+              'rgb(139, 92, 246)',
+              'rgb(236, 72, 153)'
+            ],
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            }
-          },
-          x: {
-            grid: {
-              display: false
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+            },
+            title: {
+              display: true,
+              text: 'Proporção de Alunos por Curso',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
             }
           }
         }
-      }
-    })
-  }
+      })
+    }
 
-  // Gráfico de Frequência
-  if (frequenciaChartRef.value) {
-    new Chart(frequenciaChartRef.value, {
-      type: 'doughnut',
-      data: {
-        labels: ['Presente', 'Ausente', 'Justificado'],
-        datasets: [{
-          data: [75, 15, 10],
-          backgroundColor: [
-            'rgba(34, 197, 94, 0.2)',
-            'rgba(239, 68, 68, 0.2)',
-            'rgba(234, 179, 8, 0.2)'
-          ],
-          borderColor: [
-            'rgb(34, 197, 94)',
-            'rgb(239, 68, 68)',
-            'rgb(234, 179, 8)'
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: 'Distribuição de Frequência',
-            font: {
-              size: 16,
-              weight: 'bold'
+    // Buscar dados para o gráfico de turmas por turno
+    const turmasPorTurnoResponse = await fetch('http://localhost:3000/api/dashboard/classes/by-shift')
+    const turmasPorTurnoData: ShiftStats[] = await turmasPorTurnoResponse.json()
+
+    // Atualizar gráfico de turmas por turno
+    if (notasChartRef.value) {
+      new Chart(notasChartRef.value, {
+        type: 'pie',
+        data: {
+          labels: turmasPorTurnoData.map((item: ShiftStats) => item.shift),
+          datasets: [{
+            data: turmasPorTurnoData.map((item: ShiftStats) => item.count),
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.2)',
+              'rgba(16, 185, 129, 0.2)',
+              'rgba(245, 158, 11, 0.2)'
+            ],
+            borderColor: [
+              'rgb(59, 130, 246)',
+              'rgb(16, 185, 129)',
+              'rgb(245, 158, 11)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Distribuição de Turmas por Turno',
+              font: {
+                size: 16,
+                weight: 'bold'
+              }
             }
           }
         }
-      }
-    })
+      })
+    }
+  } catch (error) {
+    console.error('Erro ao carregar dados:', error)
   }
 })
 </script>
@@ -223,19 +264,19 @@ onMounted(() => {
 
     <!-- Grid de Gráficos -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Gráfico de Distribuição de Alunos -->
+      <!-- Gráfico de Distribuição de Alunos por Curso (Barras) -->
       <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 h-[350px]">
         <canvas ref="alunosChartRef"></canvas>
       </div>
 
-      <!-- Gráfico de Notas Médias -->
+      <!-- Gráfico de Turmas por Turno -->
       <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 h-[350px]">
         <canvas ref="notasChartRef"></canvas>
       </div>
 
-      <!-- Gráfico de Frequência -->
+      <!-- Gráfico de Distribuição de Alunos por Curso (Pizza) -->
       <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 h-[350px]">
-        <canvas ref="frequenciaChartRef"></canvas>
+        <canvas ref="alunosPorCursoPizzaRef"></canvas>
       </div>
 
       <!-- Container para Futuros Gráficos -->

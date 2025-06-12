@@ -2,6 +2,7 @@ require("dotenv").config();
 const Teacher = require("../models/Teacher.js");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const { cpf } = require("cpf-cnpj-validator");
 
 exports.register = async (req, res) => {
   try {
@@ -11,21 +12,90 @@ exports.register = async (req, res) => {
       "email",
       "CPF",
       "phone",
-      "course",
       "password",
     ];
 
     const missingFields = requiredFields.filter((field) => !req.body[field]);
     if (missingFields.length > 0) {
       return res.status(400).json({
-        error: "Erro de validação",
-        message: "Campos obrigatórios não preenchidos",
+        success: false,
+        error: "Campos obrigatórios não preenchidos",
+        message: "Por favor, preencha todos os campos obrigatórios",
         details: missingFields.reduce((acc, field) => {
-          acc[field] = `${
-            field.charAt(0).toUpperCase() + field.slice(1)
+          acc[field] = `O campo ${
+            field === 'CPF' ? 'CPF' :
+            field === 'name' ? 'Nome' :
+            field === 'age' ? 'Idade' :
+            field === 'email' ? 'Email' :
+            field === 'phone' ? 'Telefone' :
+            field === 'password' ? 'Senha' : field
           } é obrigatório`;
           return acc;
         }, {}),
+      });
+    }
+
+    // Validação de idade
+    if (req.body.age < 18 || req.body.age > 80) {
+      return res.status(400).json({
+        success: false,
+        error: "Idade inválida",
+        message: "A idade deve estar entre 18 e 80 anos",
+        field: "age"
+      });
+    }
+
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(req.body.email)) {
+      return res.status(400).json({
+        success: false,
+        error: "Email inválido",
+        message: "Por favor, insira um email válido",
+        field: "email"
+      });
+    }
+
+    // Validação de CPF
+    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+    const cpfValue = req.body.CPF.replace(/\D/g, '');
+    if (!cpfRegex.test(req.body.CPF)) {
+      return res.status(400).json({
+        success: false,
+        error: "CPF inválido",
+        message: "Por favor, insira um CPF válido no formato 000.000.000-00",
+        field: "CPF"
+      });
+    }
+
+    // Validação adicional do CPF usando a biblioteca
+    if (!cpf.isValid(cpfValue)) {
+      return res.status(400).json({
+        success: false,
+        error: "CPF inválido",
+        message: "O CPF informado não é válido",
+        field: "CPF"
+      });
+    }
+
+    // Validação de telefone
+    const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/;
+    if (!phoneRegex.test(req.body.phone)) {
+      return res.status(400).json({
+        success: false,
+        error: "Telefone inválido",
+        message: "Por favor, insira um telefone válido no formato (00) 00000-0000",
+        field: "phone"
+      });
+    }
+
+    // Validação de senha
+    if (req.body.password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: "Senha inválida",
+        message: "A senha deve ter pelo menos 6 caracteres",
+        field: "password"
       });
     }
 
@@ -34,18 +104,20 @@ exports.register = async (req, res) => {
     });
     if (existingEmail) {
       return res.status(400).json({
-        error: "Email duplicado",
-        message: "Email já cadastrado",
-        field: "email",
+        success: false,
+        error: "Email já cadastrado",
+        message: "Este email já está sendo utilizado por outro professor",
+        field: "email"
       });
     }
 
     const existingCPF = await Teacher.findOne({ CPF: req.body.CPF });
     if (existingCPF) {
       return res.status(400).json({
-        error: "CPF duplicado",
-        message: "CPF já registrado",
-        field: "CPF",
+        success: false,
+        error: "CPF já cadastrado",
+        message: "Este CPF já está sendo utilizado por outro professor",
+        field: "CPF"
       });
     }
 
@@ -69,38 +141,46 @@ exports.register = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN || "1h",
     });
 
-    console.log("JWT_SECRET carregado:", process.env.JWT_SECRET);
-
     return res.status(201).json({
       success: true,
+      message: "Professor cadastrado com sucesso!",
       token,
       user: {
         id: teacher._id,
         name: teacher.name,
         email: teacher.email,
-        course: teacher.course,
         role: "teacher",
       },
     });
   } catch (error) {
-    console.error("ERRO NO REGISTRO", error);
+    console.error("ERRO NO REGISTRO:", error);
 
     if (error.name === "ValidationError") {
       return res.status(400).json({
+        success: false,
         error: "Dados inválidos",
+        message: "Por favor, verifique os dados informados",
+        details: Object.keys(error.errors).reduce((acc, key) => {
+          acc[key] = error.errors[key].message;
+          return acc;
+        }, {})
       });
     }
 
     if (error.code === 11000) {
       return res.status(400).json({
+        success: false,
         error: "Dado duplicado",
-        details: "Email ou CPF já existente",
+        message: "Este email ou CPF já está cadastrado no sistema",
+        details: "Por favor, utilize outro email ou CPF"
       });
     }
 
     return res.status(500).json({
+      success: false,
       error: "Erro ao criar professor",
-      details: error.message,
+      message: "Ocorreu um erro ao processar seu cadastro. Por favor, tente novamente.",
+      details: error.message
     });
   }
 };

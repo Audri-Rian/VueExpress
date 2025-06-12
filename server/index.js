@@ -7,10 +7,10 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const connectToDatabase = require("./database/testConnection");
-const teacherRoutes = require("../server/Routes/teacherRoutes");
-const studentRoutes = require("../server/Routes/studentRoutes");
-const classRoutes = require("../server/Routes/classRoutes");
-const courseRoutes = require("../server/Routes/courseRoutes");
+const teacherRoutes = require("./Routes/teacherRoutes");
+const studentRoutes = require("./Routes/studentRoutes");
+const classRoutes = require("./Routes/classRoutes");
+const courseRoutes = require("./Routes/courseRoutes");
 const { cpf } = require("cpf-cnpj-validator");
 
 //conectar ao mongoDB
@@ -21,12 +21,12 @@ app.use(cors());
 app.use(express.json());
 
 // Rotas
-app.use("/api", teacherRoutes);
-app.use("/api", studentRoutes);
-app.use("/api", classRoutes);
-app.use("/api", courseRoutes);
+app.use("/api/teachers", teacherRoutes);
+app.use("/api/students", studentRoutes);
+app.use("/api/classes", classRoutes);
+app.use("/api/courses", courseRoutes);
 
-//inicia o servidorr
+//inicia o servidor
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

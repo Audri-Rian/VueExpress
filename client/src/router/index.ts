@@ -5,6 +5,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      redirect: (to) => {
+        return localStorage.getItem('user') ? '/home' : '/login'
+      }
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('../views/auth/login/index.vue')
@@ -20,7 +26,7 @@ const router = createRouter({
       component: () => import('../views/Settings.vue')
     },
     {
-      path: '/',
+      path: '/home',
       name: 'home',
       component: HomeView
     },
@@ -50,6 +56,19 @@ const router = createRouter({
       component: () => import('../views/EditFrequency.vue')
     }
   ]
+})
+
+// Adiciona um guarda de navegação global
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/login', '/register']
+  const authRequired = !publicPages.includes(to.path)
+  const loggedIn = localStorage.getItem('user') // Você pode ajustar isso de acordo com sua lógica de autenticação
+
+  if (authRequired && !loggedIn) {
+    return next('/login')
+  }
+
+  next()
 })
 
 export default router

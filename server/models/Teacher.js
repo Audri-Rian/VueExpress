@@ -35,10 +35,6 @@ const teacherSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    course: {
-      type: String,
-      required: true,
-    },
     isActive: {
       type: Boolean,
       default: true,

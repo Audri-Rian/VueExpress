@@ -133,17 +133,6 @@
                             </div>
                         </div>
 
-                        <!-- Search and Filter -->
-                        <div class="mb-4">
-                            <div class="relative">
-                                <input type="text" v-model="searchQuery" placeholder="Buscar cursos..."
-                                    class="w-full bg-white/70 border-2 border-gray-200 rounded-lg pl-10 pr-4 py-2 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200">
-                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </div>
-                        </div>
-
                         <!-- Loading State -->
                         <div v-if="loading" class="flex justify-center items-center py-8">
                             <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -154,7 +143,7 @@
 
                         <!-- Courses List -->
                         <div v-else class="space-y-4 max-h-[600px] overflow-y-auto pr-3">
-                            <div v-for="course in filteredCourses" :key="course._id" 
+                            <div v-for="course in courses" :key="course._id" 
                                 class="bg-white rounded-lg border border-gray-100 p-6 hover:shadow-md transition-all duration-200">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1 min-w-0">
@@ -183,7 +172,7 @@
                             </div>
 
                             <!-- Empty State -->
-                            <div v-if="filteredCourses.length === 0" class="text-center py-8">
+                            <div v-if="courses.length === 0" class="text-center py-8">
                                 <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -257,24 +246,12 @@ export default {
             toastMessage: '',
             showToast: false,
             isError: false,
-            searchQuery: '',
             courses: [],
             loading: false,
             editingCourse: null,
             showDeleteModal: false,
             courseToDelete: null
         };
-    },
-    computed: {
-        filteredCourses() {
-            if (!this.searchQuery) return this.courses;
-            const query = this.searchQuery.toLowerCase();
-            return this.courses.filter(course => 
-                course.title.toLowerCase().includes(query) ||
-                course.code.toLowerCase().includes(query) ||
-                course.description.toLowerCase().includes(query)
-            );
-        }
     },
     async created() {
         await this.loadCourses();

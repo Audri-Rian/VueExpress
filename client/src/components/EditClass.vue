@@ -29,7 +29,6 @@ export default {
       showDeleteModal: false,
       deletingIndex: null,
       currentView: {},
-      search: '',
       toastMessage: '',
       showToast: false,
       isError: false,
@@ -37,12 +36,6 @@ export default {
     }
   },
   computed: {
-    filteredClasses() {
-      const term = this.search.toLowerCase()
-      return this.classes.filter(
-        (t) => t.name.toLowerCase().includes(term) || t.course.title.toLowerCase().includes(term),
-      )
-    },
     currentYear() {
       return new Date().getFullYear()
     },
@@ -391,116 +384,65 @@ export default {
 
         <!-- Classes List Section -->
         <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">Turmas Existentes</h2>
-            <div class="relative">
-              <input
-                v-model="search"
-                type="text"
-                placeholder="Buscar turmas..."
-                class="pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-              />
-              <svg
-                class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                ></path>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-xl font-bold text-gray-900">
+                Turmas Cadastradas
+              </h2>
+              <p class="text-sm text-gray-600">Lista de turmas disponíveis</p>
+            </div>
+            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
               </svg>
             </div>
           </div>
 
+          <!-- Loading State -->
           <div v-if="loading" class="flex justify-center items-center py-8">
-            <svg class="animate-spin h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24">
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+            <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
           </div>
 
-          <div v-else-if="filteredClasses.length === 0" class="text-center py-8">
-            <p class="text-gray-500">Nenhuma turma encontrada</p>
-          </div>
-
-          <div v-else class="space-y-4">
-            <div
-              v-for="turma in filteredClasses"
-              :key="turma._id"
-              class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow"
-            >
+          <!-- Classes List -->
+          <div v-else class="space-y-4 max-h-[600px] overflow-y-auto pr-3">
+            <div v-for="classItem in classes" :key="classItem._id" 
+              class="bg-white rounded-lg border border-gray-100 p-6 hover:shadow-md transition-all duration-200">
               <div class="flex items-start justify-between">
                 <div class="flex-1 min-w-0">
-                  <h3 class="font-semibold text-gray-900 truncate">{{ turma.name }}</h3>
+                  <h3 class="font-semibold text-gray-900 truncate">{{ classItem.name }}</h3>
                   <div class="flex items-center mt-1 space-x-2">
-                    <span
-                      v-if="turma.course"
-                      class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
-                      >{{ turma.course.title }}</span
-                    >
-                    <span v-else class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded"
-                      >Curso não definido</span
-                    >
-                    <span class="text-xs text-gray-500">{{ turma.period }}</span>
-                    <span class="text-xs text-gray-500">{{ turma.year }}</span>
-                  </div>
-                  <div class="mt-2">
-                    <span
-                      class="inline-flex px-2 py-1 text-xs font-medium rounded-md"
-                      :class="{
-                        'bg-yellow-100 text-yellow-800': turma.shift === 'Matutino',
-                        'bg-orange-100 text-orange-800': turma.shift === 'Vespertino',
-                        'bg-purple-100 text-purple-800': turma.shift === 'Noturno',
-                      }"
-                    >
-                      {{ turma.shift }}
+                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                      {{ classItem.course?.title || 'Curso não encontrado' }}
                     </span>
+                    <span class="text-xs text-gray-500">{{ classItem.period }}</span>
+                    <span class="text-xs text-gray-500">{{ classItem.year }}</span>
+                    <span class="text-xs text-gray-500">{{ classItem.shift }}</span>
                   </div>
                 </div>
                 <div class="flex space-x-2 ml-4 flex-shrink-0">
-                  <button
-                    @click="editClass(turma._id)"
-                    class="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                  >
+                  <button @click="editClass(classItem._id)" class="p-1 text-gray-400 hover:text-blue-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      ></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                   </button>
-                  <button
-                    @click="deleteClass(turma._id)"
-                    class="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                  >
+                  <button @click="deleteClass(classItem._id)" class="p-1 text-gray-400 hover:text-red-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
                   </button>
                 </div>
               </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-if="classes.length === 0" class="text-center py-8">
+              <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <p class="text-gray-500">Nenhuma turma encontrada</p>
             </div>
           </div>
         </div>

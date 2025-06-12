@@ -35,7 +35,11 @@ exports.createDiscipline = async (req, res) => {
 // Listar todas as disciplinas
 exports.getAllDisciplines = async (req, res) => {
   try {
-    const disciplines = await Discipline.find().populate("cursoId");
+    const disciplines = await Discipline.find()
+      .populate({
+        path: 'cursoId',
+        select: 'title code'
+      });
     res.json(disciplines);
   } catch (error) {
     console.log("erro ao buscar disciplina", error);

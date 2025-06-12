@@ -13,49 +13,54 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/auth/login/index.vue')
+      component: () => import('../views/auth/login/index.vue'),
     },
     {
       path: '/register',
       name: 'register',
-      component: () => import('../views/auth/register/index.vue')
+      component: () => import('../views/auth/register/index.vue'),
     },
     {
       path: '/configuracoes',
       name: 'configuracoes',
-      component: () => import('../views/Settings.vue')
+      component: () => import('../views/Settings.vue'),
     },
     {
       path: '/home',
       name: 'home',
-      component: HomeView
+      component: HomeView,
     },
     {
       path: '/editclass',
       name: 'editclass',
-      component: () => import('../views/EditClass.vue')
+      component: () => import('../views/EditClass.vue'),
     },
     {
       path: '/listadealunos',
       name: 'listadealunos',
-      component: () => import('../views/ListStudents.vue')
+      component: () => import('../views/ListStudents.vue'),
     },
     {
       path: '/createcurse',
       name: 'createcurse',
-      component: () => import('../views/CreateCurse.vue')
+      component: () => import('../views/CreateCurse.vue'),
     },
     {
       path: '/notas',
       name: 'notas',
-      component: () => import('../views/EditNotes.vue')
+      component: () => import('../views/EditNotes.vue'),
     },
     {
       path: '/frequencia',
       name: 'frequencia',
-      component: () => import('../views/EditFrequency.vue')
-    }
-  ]
+      component: () => import('../views/EditFrequency.vue'),
+    },
+    {
+      path: '/disciplina',
+      name: 'disciplina',
+      component: () => import('../views/CreateDiscipline.vue'),
+    },
+  ],
 })
 
 // Adiciona um guarda de navegação global

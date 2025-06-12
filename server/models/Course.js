@@ -12,7 +12,7 @@ const courseSchema = new mongoose.Schema(
     description: {
       type: String,
       required: [true, "A descrição é obrigatória"],
-      trim: true
+      trim: true,
     },
     code: {
       type: String,
@@ -25,12 +25,20 @@ const courseSchema = new mongoose.Schema(
       required: true,
       min: 1,
       max: 12,
-      default: 1
+      default: 1,
     },
-    classes: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Class'
-    }]
+    classes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Class",
+      },
+    ],
+    disciplines: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Discipline",
+      },
+    ],
   },
   {
     timestamps: true,

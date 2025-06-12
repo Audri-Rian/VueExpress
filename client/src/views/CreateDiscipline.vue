@@ -1,0 +1,6 @@
+<script setup lang="ts">
+import EditClass from '../components/CreateDiscipline.vue'
+</script>
+<template>
+  <EditClass class="rounded-3xl" />
+</template>

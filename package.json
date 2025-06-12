@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Audri-Rian/VueExpress#readme",
   "dependencies": {
     "chart.js": "^4.4.9",
+    "concurrently": "^9.1.2",
     "cpf-cnpj-validator": "^1.0.3"
   }
 }

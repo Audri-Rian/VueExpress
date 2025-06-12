@@ -12,6 +12,7 @@ const studentRoutes = require("./Routes/studentRoutes");
 const classRoutes = require("./Routes/classRoutes");
 const courseRoutes = require("./Routes/courseRoutes");
 const { cpf } = require("cpf-cnpj-validator");
+const statsRoutes = require('./routes/stats');
 
 //conectar ao mongoDB
 connectToDatabase();
@@ -25,6 +26,7 @@ app.use("/api/teachers", teacherRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/courses", courseRoutes);
+app.use('/api', statsRoutes);
 
 //inicia o servidor
 app.listen(port, () => {

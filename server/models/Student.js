@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { cpf } = require("cpf-cnpj-validator");
 
 const studentsSchema = new mongoose.Schema(
   {
@@ -24,8 +23,9 @@ const studentsSchema = new mongoose.Schema(
       required: [true, "CPF é obrigatório"],
       unique: true,
       validate: {
-        validator: (v) => cpf.isValid(v.replace(/\D/g, "")),
-      },
+        validator: (v) => v.replace(/\D/g, "").length === 11,
+        message: "CPF deve conter 11 dígitos"
+      }
     },
     gender: {
       type: String,

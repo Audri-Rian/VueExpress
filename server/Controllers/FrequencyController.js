@@ -135,3 +135,55 @@ exports.update = async (req, res) => {
     res.status(500).json({ error: "Erro interno ao atualizar frequência" });
   }
 };
+
+exports.getFrequenciesByClassAndDate = async (req, res) => {
+  try {
+    const { classId, date } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(classId)) {
+      return res.status(400).json({ error: "ID da turma inválido" });
+    }
+
+    const startDate = new Date(date);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const endDate = new Date(date);
+    endDate.setHours(23, 59, 59, 999);
+
+    const frequencies = await Frequency.find({
+      class: classId,
+      date: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    })
+    .populate('student', 'name registration')
+    .populate('class', 'name');
+
+    res.status(200).json(frequencies);
+  } catch (error) {
+    console.error("Erro ao buscar frequências por turma e data:", error);
+    res.status(500).json({ error: "Erro interno ao buscar frequências" });
+  }
+};
+
+exports.delete = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "ID inválido" });
+    }
+
+    const deletedFrequency = await Frequency.findByIdAndDelete(id);
+
+    if (!deletedFrequency) {
+      return res.status(404).json({ error: "Frequência não encontrada" });
+    }
+
+    res.status(200).json({ message: "Frequência excluída com sucesso" });
+  } catch (error) {
+    console.error("Erro ao excluir frequência:", error);
+    res.status(500).json({ error: "Erro interno ao excluir frequência" });
+  }
+};

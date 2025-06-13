@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import axios from 'axios'
+import { endpoints } from '../../../config/api'
 
 interface FormErrors {
   email?: string
@@ -29,7 +30,7 @@ const handleLogin = async () => {
       password: formData.value.password
     })
 
-    const response = await axios.post('http://localhost:3000/api/teachers/loginProfessor', {
+    const response = await axios.post(endpoints.auth.login, {
       email: formData.value.email.toLowerCase().trim(),
       password: formData.value.password
     })

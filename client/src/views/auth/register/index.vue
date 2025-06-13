@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { endpoints } from '../../../config/api'
 
 interface FormData {
   name: string
@@ -89,7 +90,7 @@ const handleRegister = async () => {
   errors.value = {}
 
   try {
-    const response = await axios.post('http://localhost:3000/api/teachers/registerProfessor', {
+    const response = await axios.post(endpoints.auth.register, {
       name: formData.value.name,
       age: Number(formData.value.age),
       email: formData.value.email.toLowerCase().trim(),

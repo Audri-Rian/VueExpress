@@ -1,11 +1,10 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:3000/api';
+import { endpoints } from '../config/api';
 
 const classService = {
     async getAllClasses() {
         try {
-            const response = await axios.get(`${API_URL}/classes`);
+            const response = await axios.get(endpoints.classes);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Erro ao carregar turmas');
@@ -14,7 +13,7 @@ const classService = {
 
     async getClassById(id) {
         try {
-            const response = await axios.get(`${API_URL}/classes/${id}`);
+            const response = await axios.get(`${endpoints.classes}/${id}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Erro ao carregar turma');
@@ -23,7 +22,7 @@ const classService = {
 
     async createClass(classData) {
         try {
-            const response = await axios.post(`${API_URL}/classes`, classData);
+            const response = await axios.post(endpoints.classes, classData);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Erro ao criar turma');
@@ -32,7 +31,7 @@ const classService = {
 
     async updateClass(id, classData) {
         try {
-            const response = await axios.put(`${API_URL}/classes/${id}`, classData);
+            const response = await axios.put(`${endpoints.classes}/${id}`, classData);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Erro ao atualizar turma');
@@ -41,7 +40,7 @@ const classService = {
 
     async deleteClass(id) {
         try {
-            const response = await axios.delete(`${API_URL}/classes/${id}`);
+            const response = await axios.delete(`${endpoints.classes}/${id}`);
             return response.data;
         } catch (error) {
             throw new Error(error.response?.data?.message || 'Erro ao excluir turma');

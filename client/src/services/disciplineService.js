@@ -1,11 +1,10 @@
 import axios from 'axios'
-
-const API_URL = 'http://localhost:3000/api/disciplines'
+import { endpoints } from '../config/api'
 
 export const disciplineService = {
   async getAllDisciplines() {
     try {
-      const response = await axios.get(API_URL)
+      const response = await axios.get(endpoints.disciplines)
       console.log('Resposta do servidor (disciplinas):', response.data)
       return response.data
     } catch (error) {
@@ -16,7 +15,7 @@ export const disciplineService = {
 
   async getDisciplinesByCourse(courseId) {
     try {
-      const response = await axios.get(`${API_URL}/course/${courseId}`)
+      const response = await axios.get(`${endpoints.disciplines}/course/${courseId}`)
       return response.data
     } catch (error) {
       console.error('Erro ao buscar disciplinas do curso:', error)
@@ -26,7 +25,7 @@ export const disciplineService = {
 
   async getDisciplineById(id) {
     try {
-      const response = await axios.get(`${API_URL}/${id}`)
+      const response = await axios.get(`${endpoints.disciplines}/${id}`)
       return response.data
     } catch (error) {
       throw new Error(error.response?.data?.error || 'Erro ao buscar disciplina')
@@ -35,7 +34,7 @@ export const disciplineService = {
 
   async createDiscipline(disciplineData) {
     try {
-      const response = await axios.post(API_URL, disciplineData)
+      const response = await axios.post(endpoints.disciplines, disciplineData)
       return response.data
     } catch (error) {
       throw new Error(error.response?.data?.error || 'Erro ao criar disciplina')
@@ -44,7 +43,7 @@ export const disciplineService = {
 
   async updateDiscipline(id, disciplineData) {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, disciplineData)
+      const response = await axios.put(`${endpoints.disciplines}/${id}`, disciplineData)
       return response.data
     } catch (error) {
       throw new Error(error.response?.data?.error || 'Erro ao atualizar disciplina')
@@ -53,7 +52,7 @@ export const disciplineService = {
 
   async deleteDiscipline(id) {
     try {
-      const response = await axios.delete(`${API_URL}/${id}`)
+      const response = await axios.delete(`${endpoints.disciplines}/${id}`)
       return response.data
     } catch (error) {
       throw new Error(error.response?.data?.error || 'Erro ao excluir disciplina')

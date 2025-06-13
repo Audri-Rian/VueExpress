@@ -1,11 +1,10 @@
 import axios from 'axios'
-
-const API_URL = 'http://localhost:3000/api'
+import { endpoints } from '../config/api'
 
 export const studentService = {
   async createStudent(studentData) {
     try {
-      const response = await axios.post(`${API_URL}/students/registerAluno`, studentData)
+      const response = await axios.post(endpoints.students.register, studentData)
       return response.data
     } catch (error) {
       if (error.response) {
@@ -23,7 +22,7 @@ export const studentService = {
 
   async getAllStudents() {
     try {
-      const response = await axios.get(`${API_URL}/students`)
+      const response = await axios.get(endpoints.students.base)
       return response.data
     } catch (error) {
       if (error.response) {
@@ -38,7 +37,7 @@ export const studentService = {
 
   async getStudentById(id) {
     try {
-      const response = await axios.get(`${API_URL}/students/${id}`)
+      const response = await axios.get(`${endpoints.students.base}/${id}`)
       return response.data
     } catch (error) {
       if (error.response) {
@@ -53,7 +52,7 @@ export const studentService = {
 
   async updateStudent(id, studentData) {
     try {
-      const response = await axios.put(`${API_URL}/students/${id}`, studentData)
+      const response = await axios.put(`${endpoints.students.base}/${id}`, studentData)
       return response.data
     } catch (error) {
       if (error.response) {
@@ -68,7 +67,7 @@ export const studentService = {
 
   async deleteStudent(id) {
     try {
-      const response = await axios.delete(`${API_URL}/students/${id}`)
+      const response = await axios.delete(`${endpoints.students.base}/${id}`)
       return response.data
     } catch (error) {
       if (error.response) {

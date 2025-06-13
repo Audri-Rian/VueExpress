@@ -20,8 +20,16 @@ const statsRoutes = require("./routes/stats");
 //conectar ao mongoDB
 connectToDatabase();
 
+// Configuração do CORS
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173', // URL padrão do Vite
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rotas

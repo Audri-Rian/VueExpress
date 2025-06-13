@@ -1,11 +1,10 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:3000/api';
+import { endpoints } from '../config/api';
 
 const noteService = {
   async createNote(noteData) {
     try {
-      const response = await axios.post(`${API_URL}/notes`, noteData);
+      const response = await axios.post(endpoints.notes.base, noteData);
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Erro ao criar nota');
@@ -14,7 +13,7 @@ const noteService = {
 
   async updateNote(noteId, noteData) {
     try {
-      const response = await axios.put(`${API_URL}/notes/${noteId}`, noteData);
+      const response = await axios.put(`${endpoints.notes.base}/${noteId}`, noteData);
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Erro ao atualizar nota');
@@ -23,7 +22,7 @@ const noteService = {
 
   async getNotesByCourseAndDiscipline(courseId, disciplineId) {
     try {
-      const response = await axios.get(`${API_URL}/notes/course/${courseId}/discipline/${disciplineId}`);
+      const response = await axios.get(endpoints.notes.byCourseAndDiscipline(courseId, disciplineId));
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Erro ao buscar notas da disciplina');
@@ -32,7 +31,7 @@ const noteService = {
 
   async getNotesByStudent(studentId) {
     try {
-      const response = await axios.get(`${API_URL}/notes/student/${studentId}`);
+      const response = await axios.get(endpoints.notes.byStudent(studentId));
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Erro ao buscar notas do aluno');
@@ -41,7 +40,7 @@ const noteService = {
 
   async bulkUpdateNotes(notesData) {
     try {
-      const response = await axios.post(`${API_URL}/notes/bulk`, { notes: notesData });
+      const response = await axios.post(endpoints.notes.bulk, { notes: notesData });
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Erro ao atualizar notas em lote');

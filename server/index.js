@@ -13,9 +13,9 @@ const classRoutes = require("./Routes/classRoutes");
 const courseRoutes = require("./Routes/courseRoutes");
 const disciplineRoutes = require("./Routes/disciplineRoutes");
 const frequencyRoutes = require("./Routes/frequencyRoutes");
-const noteRoutes = require("./routes/noteRoutes");
+const noteRoutes = require("./Routes/noteRoutes");
 const { cpf } = require("cpf-cnpj-validator");
-const statsRoutes = require("./routes/stats");
+const statsRoutes = require("./Routes/stats");
 
 //conectar ao mongoDB
 connectToDatabase();

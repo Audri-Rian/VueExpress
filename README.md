@@ -88,7 +88,7 @@ npm run dev
 - [Guia de Contribuição](CONTRIBUTING.md)
 
 ## 📸 Screenshots
-![Dashboard do EduManager](screenshots/dashboard.png)
+![Dashboard do EduManager](image.png)
 
 ## ✍️ Contribuições
 | Responsável | Função | Principais Responsabilidades Técnicas |
